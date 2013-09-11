@@ -77,6 +77,29 @@ function srcCache( id, fname, play ) {
 
 }
 
+function exist( fname, c, e ){
+	var path = "/mnt/sdcard/cpt/";
+	var result = false ;
+	window.requestFileSystem(
+		LocalFileSystem.PERSISTENT,
+		0,
+		function(fs) {
+			alert("fs: "+fileSystem.root.fullPath)
+			fs.root.getFile( 
+				path+fname,
+				{create: c, exclusive: e}, 
+				function(fe) {	// found in cache
+					alert( "found in cache"+ fe.name ) ;
+					result = true;
+				},
+				function(er) {	// go get it
+					alert("Not in cache") ;
+				});
+		},
+		errorHandler);
+	return result ;
+
+}
 
 
 function src( id, file ){ 
@@ -96,6 +119,13 @@ alert("End Script");
  
     </head>
     <body>
+
+<button onclick="exist('zzz.jpg', false, true );">exist(z,f,t)</button>
+<br>
+<button onclick="exist('zzz.jpg', true, true );">exist(z,t,t)</button>
+<br>
+<button onclick="exist('hooray.mp3', false, true );">exist(h,f,t)</button>
+<br>
 
 
 <button onclick="srcCache('img', 'bike1.jpg');">('img', 'bike1.jpg')</button>
