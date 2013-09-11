@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+        <title>Hello World</title>
+ <script>
+ 
+ function errorHandler(e) {
+	  var msg = '';
+
+	  switch (e.code) {
+	    case FileError.QUOTA_EXCEEDED_ERR:
+	      msg = 'QUOTA_EXCEEDED_ERR';
+	      break;
+	    case FileError.NOT_FOUND_ERR:
+	      msg = 'NOT_FOUND_ERR';
+	      break;
+	    case FileError.SECURITY_ERR:
+	      msg = 'SECURITY_ERR';
+	      break;
+	    case FileError.INVALID_MODIFICATION_ERR:
+	      msg = 'INVALID_MODIFICATION_ERR';
+	      break;
+	    case FileError.INVALID_STATE_ERR:
+	      msg = 'INVALID_STATE_ERR';
+	      break;
+	    default:
+	      msg = 'Unknown Error';
+	      break;
+		}
+}
+	  
+function srcCache( id, fname, play ) {
+	var fileSystem = null ;
+	var fsType = LocalFileSystem.PERSISTENT;
+	var fsSize = 0 ;
+	var path = "/mnt/sdcard/cpt/" ;
+	var url = "http://cpt.aws.af.cm/cpt/";
+	
+	window.requestFileSystem(
+		fsType,
+		fsSize,
+		function(fs) {
+       	fileSystem = fs;
+			alert("fs: "+fileSystem.root.fullPath)
+			fs.root.getFile( 
+				path+fname,
+				{create: false, exclusive: true}, 
+				function(fe) {	// found in cache
+					alert( "found in cache"+ fe.name ) ;
+					var dom = document.getElementById( id );
+					dom.src= "file://"+path+fname ;
+					if( play) 
+						dom.play() ;
+				},
+				function(er) {	// go get it
+       			alert("Not in cache") ;
+					var dom = document.getElementById( id );
+					dom.src= url+fname ;
+					if(play)
+						dom.play() ;
+					// and go get it
+       			var ft = new FileTransfer();
+       			ft.download(
+       			    encodeURI( url+fname ),
+       			    path+fname,				//TODO: add tmp during download
+       			    function(entry) { // downloaded
+       			        alert("download complete: "); //TODO: remove tmp name
+       			    },
+       			    errorHandler);
+				});
+		},
+		errorHandler);
+
+}
+
+
+
+function src( id, file ){ 
+	file = "file:///mnt/sdcard/cpt/" + file ;
+	console.log(id, file);
+	var el = document.getElementById(id) ;
+	el.src = file;
+	el.play() ;
+}
+
+alert("End Script");
+
+ 
+ </script>
+ 
+ 
+ 
+    </head>
+    <body>
+
+
+<button onclick="srcCache('img', 'bike1.jpg');">('img', 'bike1.jpg')</button>
+<br>
+<button onclick="srcCache('img', 'ZZZ.jpg');">('img', 'ZZZ.jpg')</button>
+<br>
+<button onclick="srcCache('aud', 'hooray.mp3',1);">('aud', 'hooray.mp3')</button>
+<br>
+<button onclick="srcCache('vid', 'workout.mp4',1);">('vid', 'workout.mp4')</button>
+<br>
+<button onclick="srcCache('vid', 'hooray.mp3',1);">('vid', 'hooray.mp3')</button>
+<br>
+<br>
+<img id="img" style="width:60%"></img><br>
+<audio id='aud' controls></audio><br>
+<video id="vid" controls></video><br>
+
+
+
+    </body>
+</html>
